@@ -168,6 +168,49 @@ codeunit 50501 APIHandler
         end;
     end;
 
+    procedure Update(Info: Notification)
+    var
+        Customer: Record Customer;
+        Company: Record CompanySearchResult;
+        Country: Record "Country/Region";
+    begin
+        Customer.Reset();
+        Company.Reset();
+        if Customer.Get(Info.GetData('Id')) and Company.Get(Customer."No." + Customer.HitHorizonsId) then begin
+            if NOT (Customer.Name = Company.CompanyName) then Customer.Name := Truncate(Company.CompanyName, 100);
+            if NOT (Customer.Address = Company.AddressStreetLine1) then Customer.Address := Truncate(Company.AddressStreetLine1, 100);
+            if NOT (Customer."Post Code" = Company.PostalCode) then Customer."Post Code" := Company.PostalCode;
+            if NOT (Customer.City = Company.City) then Customer.City := Truncate(Company.City, 30);
+            if NOT (Company.Country = '') then begin
+                Country.Reset();
+                Country.SetFilter(Name, '@' + Company.Country);
+                if Country.FindFirst() then begin
+                    if NOT (Customer."Country/Region Code" = Country.Code) then Customer."Country/Region Code" := Country.Code;
+                end;
+            end;
+            if NOT (Customer.Industry = GetIndustryName(Company.Industry)) then Customer.Industry := GetIndustryName(Company.Industry);
+            if NOT (Customer.EstablishmentOfOwnership = Company.EstablishmentOfOwnership) then Customer.EstablishmentOfOwnership := Company.EstablishmentOfOwnership;
+            if NOT (Customer.SalesEUR = Company.SalesEUR) then Customer.SalesEUR := Company.SalesEUR;
+            if NOT (Customer.EmployeesNumber = Company.EmployeesNumber) then Customer.EmployeesNumber := Company.EmployeesNumber;
+            if NOT (Customer."VAT Registration No." = Company.VatId) then Customer."VAT Registration No." := Truncate(Company.VatId, 20);
+            if NOT (Customer.SICText = Company.SICText) then Customer.SICText := Truncate(Company.SICText, 150);
+            if NOT (Customer.Website = Company.Website) then Customer.Website := Truncate(Company.Website, 150);
+            if NOT (Customer.EmailDomain = Company.EmailDomain) then Customer.EmailDomain := Truncate(Company.EmailDomain, 150);
+            if NOT (Customer.SalesLocal = Company.SalesLocal) then Customer.SalesLocal := Company.SalesLocal;
+            if NOT (Customer.LocalCurrencyName = GetLocalCurrencyName(Company.LocalCurrencyName)) then customer.LocalCurrencyName := GetLocalCurrencyName(Company.LocalCurrencyName);
+
+            Customer.Modify();
+            Commit();
+        end;
+    end;
+
+    procedure Truncate(textValue: Text; length: Integer) ReturnValue: Text
+    var
+    begin
+        if StrLen(textValue) > length then textValue := textValue.Substring(1, length);
+        ReturnValue := textValue;
+    end;
+
     procedure GetIndustryName(industryCode: Text) returnValue: Text
     begin
         if industryCode = 'A' then returnValue := 'Agriculture, Forestry, and Fishing';

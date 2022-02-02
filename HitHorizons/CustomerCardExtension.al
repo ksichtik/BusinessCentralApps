@@ -17,7 +17,6 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
                     Selected: Record CompanySearchResult;
                     Detail: Record CompanySearchResult;
                     Country: Record "Country/Region";
-                    TmpText: Text;
                 begin
                     Handler.Search(Rec);
                     Selected.Reset();
@@ -161,6 +160,7 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
     trigger OnAfterGetRecord();
     begin
         SetSalesLocalCaption();
+        CheckDataDiff();
     end;
 
     procedure Truncate(textValue: Text; length: Integer) ReturnValue: Text
@@ -176,5 +176,53 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
     begin
         if Rec.LocalCurrencyName = '' then localName := 'Euro' else localName := Rec.LocalCurrencyName;
         SalesLocalCaption := 'Sales local (' + localName + ')';
+    end;
+
+    local procedure CheckDataDiff()
+    var
+        Handler: Codeunit APIHandler;
+        Company: Record CompanySearchResult;
+        Country: Record "Country/Region";
+        Diff: Boolean;
+        Info: Notification;
+    begin
+        if NOT (Rec.HitHorizonsId = '') then begin
+            Handler.Detail(Rec.HitHorizonsId, Rec."No.");
+            Company.Reset();
+            if Company.Get(Rec."No." + Rec.HitHorizonsId) then begin
+                Diff := false;
+                if NOT (Rec.Name = Company.CompanyName) then Diff := true;
+                if NOT (Rec.Address = Company.AddressStreetLine1) then Diff := true;
+                if NOT (Rec."Post Code" = Company.PostalCode) then Diff := true;
+                if NOT (Rec.City = Truncate(Company.City, 30)) then Diff := true;
+                if NOT (Company.Country = '') then begin
+                    Country.Reset();
+                    Country.SetFilter(Name, '@' + Company.Country);
+                    if Country.FindFirst() then begin
+                        if NOT (Rec."Country/Region Code" = Country.Code) then Diff := true;
+                    end;
+                end else begin
+                    if NOT (Rec."Country/Region Code" = '') then Diff := true;
+                end;
+                if NOT (Rec.Industry = Handler.GetIndustryName(Company.Industry)) then Diff := true;
+                if NOT (Rec.EstablishmentOfOwnership = Company.EstablishmentOfOwnership) then Diff := true;
+                if NOT (Rec.SalesEUR = Company.SalesEUR) then Diff := true;
+                if NOT (Rec.EmployeesNumber = Company.EmployeesNumber) then Diff := true;
+                if NOT (Rec."VAT Registration No." = Company.VatId) then Diff := true;
+                if NOT (Rec.SICText = Company.SICText) then Diff := true;
+                if NOT (Rec.Website = Company.Website) then Diff := true;
+                if NOT (Rec.EmailDomain = Company.EmailDomain) then Diff := true;
+                if NOT (Rec.SalesLocal = Company.SalesLocal) then Diff := true;
+                if NOT (Rec.LocalCurrencyName = Handler.GetLocalCurrencyName(Company.LocalCurrencyName)) then Diff := true;
+
+                if Diff then begin
+                    Info.Message('Customer data can be updated from HitHorizons.');
+                    Info.AddAction('Click here to update.', Codeunit::APIHandler, 'Update');
+                    Info.SetData('Id', Rec."No.");
+                    Info.Send();
+                end;
+            end;
+        end;
+
     end;
 }
