@@ -74,6 +74,36 @@ table 50601 CompanySearchResult
         {
             DataClassification = CustomerContent;
         }
+
+        field(15; SICText; Text[150])
+        {
+            DataClassification = CustomerContent;
+        }
+
+        field(16; Website; Text[150])
+        {
+            DataClassification = CustomerContent;
+        }
+
+        field(17; EmailDomain; Text[150])
+        {
+            DataClassification = CustomerContent;
+        }
+
+        field(18; SalesLocal; Decimal)
+        {
+            DataClassification = CustomerContent;
+        }
+
+        field(19; LocalCurrency; Code[10])
+        {
+            DataClassification = CustomerContent;
+        }
+
+        field(20; LocalCurrencyName; Text[150])
+        {
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

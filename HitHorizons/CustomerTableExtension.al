@@ -31,5 +31,41 @@ tableextension 50101 "Customer Table Extension" extends Customer
             Caption = 'Industry';
             DataClassification = CustomerContent;
         }
+
+        field(50107; SICText; Text[150])
+        {
+            Caption = 'SIC';
+            DataClassification = CustomerContent;
+        }
+
+        field(50108; Website; Text[150])
+        {
+            Caption = 'Website';
+            DataClassification = CustomerContent;
+        }
+
+        field(50109; EmailDomain; Text[150])
+        {
+            Caption = 'Website';
+            DataClassification = CustomerContent;
+        }
+
+        field(50110; SalesLocal; Decimal)
+        {
+            Caption = 'Sales (local)';
+            DataClassification = CustomerContent;
+        }
+
+        field(50111; LocalCurrency; Code[10])
+        {
+            Caption = 'Local Currency';
+            DataClassification = CustomerContent;
+        }
+
+        field(50112; LocalCurrencyName; Text[150])
+        {
+            Caption = 'Local Currency Name';
+            DataClassification = CustomerContent;
+        }
     }
 }

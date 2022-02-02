@@ -23,30 +23,35 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
                     Selected.Reset();
                     Selected.SetFilter(CustomerId, Rec."No.");
                     if Page.RunModal(Page::CompanySearchResultPage, Selected) = Action::LookupOK then begin
-                        Handler.Detail(Rec);
-                        Rec.HitHorizonsId := Selected.HitHorizonsId;
-                        if NOT (Selected.CompanyName = '') then Rec.Name := Truncate(Selected.CompanyName, 100);
-                        if NOT (Selected.Country = '') then begin
-                            Country.Reset();
-                            Country.SetFilter(Name, '@' + Selected.Country);
-                            if Country.FindFirst() then begin
-                                Rec."Country/Region Code" := Country.Code;
-                            end;
-                        end;
-                        if NOT (Selected.City = '') then Rec.City := Truncate(Selected.City, 30);
-                        if NOT (Selected.PostalCode = '') then Rec."Post Code" := Selected.PostalCode;
-                        if NOT (Selected.AddressStreetLine1 = '') then Rec.Address := Truncate(Selected.AddressStreetLine1, 100);
-                        if NOT (Selected.Industry = '') then begin
-                            Rec.Industry := Handler.GetIndustryName(Selected.Industry);
-                        end;
-                        Rec.EstablishmentOfOwnership := Selected.EstablishmentOfOwnership;
-                        Rec.SalesEUR := Selected.SalesEUR;
-                        Rec.EmployeesNumber := Selected.EmployeesNumber;
-
+                        Handler.Detail(Selected.HitHorizonsId, Rec."No.");
                         Detail.Reset();
-                        Detail.SetFilter(HitHorizonsId, Selected.HitHorizonsId);
-                        if Detail.FindFirst() then begin
+                        if Detail.Get(Selected.Id) then begin
+                            Rec.HitHorizonsId := Detail.HitHorizonsId;
+                            if NOT (Detail.CompanyName = '') then Rec.Name := Truncate(Detail.CompanyName, 100);
+                            if NOT (Detail.Country = '') then begin
+                                Country.Reset();
+                                Country.SetFilter(Name, '@' + Detail.Country);
+                                if Country.FindFirst() then begin
+                                    Rec."Country/Region Code" := Country.Code;
+                                end;
+                            end;
+                            if NOT (Detail.City = '') then Rec.City := Truncate(Detail.City, 30);
+                            if NOT (Detail.PostalCode = '') then Rec."Post Code" := Detail.PostalCode;
+                            if NOT (Detail.AddressStreetLine1 = '') then Rec.Address := Truncate(Detail.AddressStreetLine1, 100);
+                            if NOT (Detail.Industry = '') then begin
+                                Rec.Industry := Handler.GetIndustryName(Detail.Industry);
+                            end;
+                            if NOT (Detail.SICText = '') then Rec.SICText := Truncate(Detail.SICText, 150);
+                            Rec.EstablishmentOfOwnership := Detail.EstablishmentOfOwnership;
+                            Rec.SalesEUR := Detail.SalesEUR;
+                            Rec.EmployeesNumber := Detail.EmployeesNumber;
                             if NOT (Detail.VatId = '') then rec."VAT Registration No." := Truncate(Detail.VatId, 20);
+                            if NOT (Detail.Website = '') then Rec.Website := Truncate(Detail.Website, 150);
+                            if NOT (Detail.EmailDomain = '') then Rec.EmailDomain := Truncate(Detail.EmailDomain, 150);
+                            Rec.SalesLocal := Detail.SalesLocal;
+                            if NOT (Detail.LocalCurrencyName = '') then begin
+                                Rec.LocalCurrencyName := Handler.GetLocalCurrencyName(Detail.LocalCurrencyName);
+                            end;
                         end;
                     end;
                 end;
@@ -67,7 +72,14 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
                 field(Industry; Rec.Industry)
                 {
                     ApplicationArea = All;
-                    Caption = 'Establishment Of Ownership';
+                    Caption = 'Industry';
+                    Editable = false;
+                }
+
+                field(SICText; Rec.SICText)
+                {
+                    ApplicationArea = All;
+                    Caption = 'SIC';
                     Editable = false;
                 }
 
@@ -78,10 +90,38 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
                     Editable = false;
                 }
 
+                field(SalesLocal; Rec.SalesLocal)
+                {
+                    ApplicationArea = All;
+                    CaptionClass = '1,5,,' + SalesLocalCaption;
+                    Editable = false;
+
+                    trigger OnValidate()
+                    begin
+                        SetSalesLocalCaption();
+                    end;
+
+
+                }
+
                 field(EmployeesNumber; Rec.EmployeesNumber)
                 {
                     ApplicationArea = All;
                     Caption = 'Number of Employees';
+                    Editable = false;
+                }
+
+                field(Website; Rec.Website)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Website';
+                    Editable = false;
+                }
+
+                field(EmailDomain; Rec.EmailDomain)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Email Domain';
                     Editable = false;
                 }
             }
@@ -115,8 +155,12 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
         }
     }
 
+    var
+        SalesLocalCaption: Text[150];
+
     trigger OnAfterGetRecord();
     begin
+        SetSalesLocalCaption();
     end;
 
     procedure Truncate(textValue: Text; length: Integer) ReturnValue: Text
@@ -124,5 +168,13 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
     begin
         if StrLen(textValue) > length then textValue := textValue.Substring(1, length);
         ReturnValue := textValue;
+    end;
+
+    local procedure SetSalesLocalCaption()
+    var
+        localName: Text;
+    begin
+        if Rec.LocalCurrencyName = '' then localName := 'Euro' else localName := Rec.LocalCurrencyName;
+        SalesLocalCaption := 'Sales local (' + localName + ')';
     end;
 }
