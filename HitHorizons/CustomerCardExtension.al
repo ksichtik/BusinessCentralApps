@@ -191,8 +191,8 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
             Company.Reset();
             if Company.Get(Rec."No." + Rec.HitHorizonsId) then begin
                 Diff := false;
-                if NOT (Rec.Name = Company.CompanyName) then Diff := true;
-                if NOT (Rec.Address = Company.AddressStreetLine1) then Diff := true;
+                if NOT (Rec.Name = Truncate(Company.CompanyName, 100)) then Diff := true;
+                if NOT (Rec.Address = Truncate(Company.AddressStreetLine1, 100)) then Diff := true;
                 if NOT (Rec."Post Code" = Company.PostalCode) then Diff := true;
                 if NOT (Rec.City = Truncate(Company.City, 30)) then Diff := true;
                 if NOT (Company.Country = '') then begin
@@ -208,10 +208,10 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
                 if NOT (Rec.EstablishmentOfOwnership = Company.EstablishmentOfOwnership) then Diff := true;
                 if NOT (Rec.SalesEUR = Company.SalesEUR) then Diff := true;
                 if NOT (Rec.EmployeesNumber = Company.EmployeesNumber) then Diff := true;
-                if NOT (Rec."VAT Registration No." = Company.VatId) then Diff := true;
-                if NOT (Rec.SICText = Company.SICText) then Diff := true;
-                if NOT (Rec.Website = Company.Website) then Diff := true;
-                if NOT (Rec.EmailDomain = Company.EmailDomain) then Diff := true;
+                if NOT (Rec."VAT Registration No." = Truncate(Company.VatId, 20)) then Diff := true;
+                if NOT (Rec.SICText = Truncate(Company.SICText, 150)) then Diff := true;
+                if NOT (Rec.Website = Truncate(Company.Website, 150)) then Diff := true;
+                if NOT (Rec.EmailDomain = Truncate(Company.EmailDomain, 150)) then Diff := true;
                 if NOT (Rec.SalesLocal = Company.SalesLocal) then Diff := true;
                 if NOT (Rec.LocalCurrencyName = Handler.GetLocalCurrencyName(Company.LocalCurrencyName)) then Diff := true;
 
