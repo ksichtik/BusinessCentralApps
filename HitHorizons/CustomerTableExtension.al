@@ -46,7 +46,7 @@ tableextension 50101 "Customer Table Extension" extends Customer
 
         field(50109; EmailDomain; Text[150])
         {
-            Caption = 'Website';
+            Caption = 'Email Domain';
             DataClassification = CustomerContent;
         }
 

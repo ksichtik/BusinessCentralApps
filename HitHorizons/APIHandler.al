@@ -53,6 +53,8 @@ codeunit 50501 APIHandler
                                 SearchResult.CompanyName := JResultToken.AsValue().AsText();
                                 JResult.AsObject().Get('AddressStreetLine1', JResultToken);
                                 SearchResult.AddressStreetLine1 := JResultToken.AsValue().AsText();
+                                JResult.AsObject().Get('AddressStreetLine2', JResultToken);
+                                SearchResult.AddressStreetLine2 := JResultToken.AsValue().AsText();
                                 JResult.AsObject().Get('PostalCode', JResultToken);
                                 SearchResult.PostalCode := JResultToken.AsValue().AsText();
                                 JResult.AsObject().Get('City', JResultToken);
@@ -127,6 +129,8 @@ codeunit 50501 APIHandler
                         if CanParseText(JResultToken) then SearchResult.CompanyName := JResultToken.AsValue().AsText();
                         JResult.AsObject().Get('AddressStreetLine1', JResultToken);
                         if CanParseText(JResultToken) then SearchResult.AddressStreetLine1 := JResultToken.AsValue().AsText();
+                        JResult.AsObject().Get('AddressStreetLine2', JResultToken);
+                        if CanParseText(JResultToken) then SearchResult.AddressStreetLine2 := JResultToken.AsValue().AsText();
                         JResult.AsObject().Get('PostalCode', JResultToken);
                         if CanParseText(JResultToken) then SearchResult.PostalCode := JResultToken.AsValue().AsText();
                         JResult.AsObject().Get('City', JResultToken);
@@ -179,6 +183,7 @@ codeunit 50501 APIHandler
         if Customer.Get(Info.GetData('Id')) and Company.Get(Customer."No." + Customer.HitHorizonsId) then begin
             if NOT (Customer.Name = Company.CompanyName) then Customer.Name := Truncate(Company.CompanyName, 100);
             if NOT (Customer.Address = Company.AddressStreetLine1) then Customer.Address := Truncate(Company.AddressStreetLine1, 100);
+            if NOT (Customer.Address = Company.AddressStreetLine2) then Customer."Address 2" := Truncate(Company.AddressStreetLine2, 100);
             if NOT (Customer."Post Code" = Company.PostalCode) then Customer."Post Code" := Company.PostalCode;
             if NOT (Customer.City = Company.City) then Customer.City := Truncate(Company.City, 30);
             if NOT (Company.Country = '') then begin
@@ -201,6 +206,8 @@ codeunit 50501 APIHandler
 
             Customer.Modify();
             Commit();
+
+            Message('Customer has been updated');
         end;
     end;
 

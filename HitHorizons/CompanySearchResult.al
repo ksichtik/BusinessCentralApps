@@ -104,6 +104,11 @@ table 50601 CompanySearchResult
         {
             DataClassification = CustomerContent;
         }
+
+        field(21; AddressStreetLine2; Text[150])
+        {
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

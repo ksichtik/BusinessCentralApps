@@ -37,6 +37,7 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
                             if NOT (Detail.City = '') then Rec.City := Truncate(Detail.City, 30);
                             if NOT (Detail.PostalCode = '') then Rec."Post Code" := Detail.PostalCode;
                             if NOT (Detail.AddressStreetLine1 = '') then Rec.Address := Truncate(Detail.AddressStreetLine1, 100);
+                            if NOT (Detail.AddressStreetLine2 = '') then Rec."Address 2" := Truncate(Detail.AddressStreetLine2, 100);
                             if NOT (Detail.Industry = '') then begin
                                 Rec.Industry := Handler.GetIndustryName(Detail.Industry);
                             end;
@@ -157,9 +158,13 @@ pageextension 50201 "Customer Card Extension" extends "Customer Card"
     var
         SalesLocalCaption: Text[150];
 
-    trigger OnAfterGetRecord();
+    trigger OnAfterGetRecord()
     begin
         SetSalesLocalCaption();
+    end;
+
+    trigger OnOpenPage()
+    begin
         CheckDataDiff();
     end;
 
